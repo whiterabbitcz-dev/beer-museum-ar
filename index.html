@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Beer Museum AR</title>
+
+  <!-- Load A-Frame FIRST, then MindAR -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* ── Start screen ── */
+    #start-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, #1a0a00 0%, #0d0d0d 50%, #0a1a0a 100%);
+      transition: opacity 0.6s ease;
+    }
+    #start-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #start-screen h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      background: linear-gradient(90deg, #f5c842, #e8a020);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    #start-screen .subtitle {
+      font-size: 0.95rem;
+      color: #888;
+      margin-bottom: 2.5rem;
+    }
+
+    .target-preview {
+      width: 200px;
+      height: 200px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid rgba(245, 200, 66, 0.3);
+      margin-bottom: 2rem;
+      box-shadow: 0 0 40px rgba(245, 200, 66, 0.1);
+    }
+    .target-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .instructions {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #aaa;
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+
+    #start-btn {
+      padding: 14px 48px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(90deg, #f5c842, #e8a020);
+      color: #1a0a00;
+      cursor: pointer;
+    }
+    #start-btn:active { transform: scale(0.96); }
+
+    /* ── Debug log ── */
+    #debug {
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      z-index: 9999;
+      font-size: 10px;
+      color: #0f0;
+      background: rgba(0,0,0,0.8);
+      padding: 8px;
+      border-radius: 6px;
+      max-width: 90vw;
+      max-height: 120px;
+      overflow-y: auto;
+      display: none;
+      font-family: monospace;
+    }
+    #debug.visible { display: block; }
+
+    /* ── HUD overlay ── */
+    #hud {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 16px 20px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent);
+      pointer-events: none;
+    }
+    #hud.visible { display: flex; }
+    #hud > * { pointer-events: auto; }
+
+    .hud-title { font-size: 0.85rem; font-weight: 600; color: rgba(255,255,255,0.9); }
+
+    #status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: rgba(255,255,255,0.1);
+      color: #aaa;
+      transition: all 0.3s ease;
+    }
+    #status-badge.found {
+      background: rgba(66, 245, 90, 0.2);
+      color: #42f55a;
+    }
+
+    /* ── Scan hint ── */
+    #scan-hint {
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 220px; height: 220px;
+      z-index: 50;
+      pointer-events: none;
+      display: none;
+      animation: pulse-corners 2s ease-in-out infinite;
+    }
+    #scan-hint.visible { display: block; }
+    #scan-hint.hidden { opacity: 0; }
+
+    .corner {
+      position: absolute;
+      width: 30px; height: 30px;
+      border-color: #f5c842;
+      border-style: solid;
+      border-width: 0;
+    }
+    .corner.tl { top: 0; left: 0; border-top-width: 3px; border-left-width: 3px; }
+    .corner.tr { top: 0; right: 0; border-top-width: 3px; border-right-width: 3px; }
+    .corner.bl { bottom: 0; left: 0; border-bottom-width: 3px; border-left-width: 3px; }
+    .corner.br { bottom: 0; right: 0; border-bottom-width: 3px; border-right-width: 3px; }
+
+    @keyframes pulse-corners {
+      0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.05); }
+    }
+
+    .scan-text {
+      position: absolute;
+      bottom: -36px; left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.7);
+    }
+
+    /* ── Info panel ── */
+    #info-panel {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 24px 20px;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 60%, transparent);
+      transform: translateY(100%);
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    #info-panel.visible { transform: translateY(0); }
+
+    .info-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #f5c842;
+      margin-bottom: 6px;
+    }
+    .info-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
+    .info-desc { font-size: 0.85rem; color: #bbb; line-height: 1.5; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════ START SCREEN ══════════════ -->
+<div id="start-screen">
+  <div class="target-preview">
+    <img src="target.jpg" alt="Target image">
+  </div>
+  <h1>Beer Museum AR</h1>
+  <p class="subtitle">Augmented Reality Experience</p>
+  <div class="instructions">
+    Namiřte kameru na exponát<br>
+    a sledujte, jak ožívá
+  </div>
+  <button id="start-btn">Spustit AR</button>
+</div>
+
+<!-- ══════════════ HUD (shown during AR) ══════════════ -->
+<div id="hud">
+  <span class="hud-title">Beer Museum AR</span>
+  <span id="status-badge">Hledám...</span>
+</div>
+
+<div id="scan-hint">
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+  <span class="scan-text">Namiřte na exponát</span>
+</div>
+
+<div id="info-panel">
+  <div class="info-label">Exponát rozpoznán</div>
+  <div class="info-title">Bio Mastylda – Milko</div>
+  <div class="info-desc">
+    Legendární česká kravička Bio Mastylda od společnosti Milko. 
+    Značka je známá svými bio mléčnými výrobky a ikonickým maskotem.
+  </div>
+</div>
+
+<!-- Debug log – triple tap to toggle -->
+<div id="debug"></div>
+
+<!-- ══════════════ NO A-FRAME IN HTML – created dynamically ══════════════ -->
+
+<script>
+  // Debug logger
+  const debugEl = document.getElementById('debug');
+  let tapCount = 0;
+  let tapTimer = null;
+  document.addEventListener('touchstart', () => {
+    tapCount++;
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(() => { tapCount = 0; }, 500);
+    if (tapCount >= 3) {
+      debugEl.classList.toggle('visible');
+      tapCount = 0;
+    }
+  });
+
+  function dbg(msg) {
+    console.log(msg);
+    const line = document.createElement('div');
+    line.textContent = `${new Date().toLocaleTimeString()}: ${msg}`;
+    debugEl.appendChild(line);
+    debugEl.scrollTop = debugEl.scrollHeight;
+  }
+
+  // Elements
+  const startScreen = document.getElementById('start-screen');
+  const startBtn = document.getElementById('start-btn');
+  const statusBadge = document.getElementById('status-badge');
+  const scanHint = document.getElementById('scan-hint');
+  const infoPanel = document.getElementById('info-panel');
+  const hud = document.getElementById('hud');
+
+  dbg('Page loaded. A-Frame: ' + (typeof AFRAME !== 'undefined'));
+  dbg('MindAR: ' + (typeof AFRAME !== 'undefined' && AFRAME.components['mindar-image'] ? 'yes' : 'no'));
+
+  startBtn.addEventListener('click', () => {
+    dbg('Start button clicked');
+    startScreen.classList.add('hidden');
+    hud.classList.add('visible');
+    scanHint.classList.add('visible');
+
+    // Create A-Frame scene dynamically
+    createARScene();
+  });
+
+  function createARScene() {
+    dbg('Creating A-Frame scene...');
+
+    const scene = document.createElement('a-scene');
+    scene.setAttribute('mindar-image', 'imageTargetSrc: ./targets.mind; autoStart: true; uiLoading: no; uiScanning: no; uiError: no;');
+    scene.setAttribute('color-space', 'sRGB');
+    scene.setAttribute('renderer', 'colorManagement: true; physicallyCorrectLights: true;');
+    scene.setAttribute('vr-mode-ui', 'enabled: false');
+    scene.setAttribute('device-orientation-permission-ui', 'enabled: false');
+
+    // Assets
+    const assets = document.createElement('a-assets');
+    const img = document.createElement('img');
+    img.id = 'overlay-img';
+    img.src = 'overlay.png';
+    assets.appendChild(img);
+    scene.appendChild(assets);
+
+    // Camera
+    const cam = document.createElement('a-camera');
+    cam.setAttribute('position', '0 0 0');
+    cam.setAttribute('look-controls', 'enabled: false');
+    scene.appendChild(cam);
+
+    // Target entity
+    const target = document.createElement('a-entity');
+    target.setAttribute('mindar-image-target', 'targetIndex: 0');
+
+    // Overlay plane
+    const plane = document.createElement('a-plane');
+    plane.setAttribute('src', '#overlay-img');
+    plane.setAttribute('position', '0 0 0');
+    plane.setAttribute('height', '0.552');
+    plane.setAttribute('width', '1');
+    plane.setAttribute('rotation', '0 0 0');
+    plane.setAttribute('material', 'transparent: true; opacity: 0.95');
+    target.appendChild(plane);
+
+    scene.appendChild(target);
+
+    // Event listeners
+    target.addEventListener('targetFound', () => {
+      dbg('TARGET FOUND!');
+      statusBadge.textContent = 'Nalezeno!';
+      statusBadge.classList.add('found');
+      scanHint.classList.add('hidden');
+      infoPanel.classList.add('visible');
+    });
+
+    target.addEventListener('targetLost', () => {
+      dbg('Target lost');
+      statusBadge.textContent = 'Hledám...';
+      statusBadge.classList.remove('found');
+      scanHint.classList.remove('hidden');
+      infoPanel.classList.remove('visible');
+    });
+
+    // Scene events
+    scene.addEventListener('loaded', () => { dbg('A-Frame scene loaded'); });
+    scene.addEventListener('renderstart', () => { dbg('A-Frame render started'); });
+    scene.addEventListener('arError', (e) => { dbg('AR Error: ' + JSON.stringify(e.detail)); });
+
+    // Add to DOM
+    document.body.appendChild(scene);
+    dbg('Scene added to DOM');
+  }
+</script>
+
+</body>
+</html>

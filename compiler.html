@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MindAR Target Compiler</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #111;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #f5c842, #e8a020);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .sub { color: #888; font-size: 0.85rem; margin-bottom: 32px; }
+    
+    .drop-zone {
+      width: 100%;
+      max-width: 400px;
+      padding: 48px 24px;
+      border: 2px dashed rgba(245, 200, 66, 0.3);
+      border-radius: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin-bottom: 24px;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: #f5c842;
+      background: rgba(245, 200, 66, 0.05);
+    }
+    .drop-zone img {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .drop-text { color: #888; font-size: 0.9rem; }
+
+    #compile-btn {
+      padding: 12px 40px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(90deg, #f5c842, #e8a020);
+      color: #1a0a00;
+      cursor: pointer;
+      display: none;
+    }
+    #compile-btn:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    #progress {
+      margin-top: 20px;
+      color: #f5c842;
+      font-size: 0.85rem;
+      display: none;
+    }
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(245, 200, 66, 0.3);
+      border-top-color: #f5c842;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .log {
+      margin-top: 16px;
+      max-width: 400px;
+      width: 100%;
+      font-size: 0.75rem;
+      color: #666;
+      text-align: left;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .log p { margin: 2px 0; }
+    .log .ok { color: #42f55a; }
+    .log .err { color: #f54242; }
+
+    .result {
+      margin-top: 24px;
+      display: none;
+      text-align: center;
+    }
+    .result a {
+      display: inline-block;
+      padding: 10px 32px;
+      background: #42f55a;
+      color: #000;
+      font-weight: 600;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+    .result p { margin-top: 12px; color: #888; font-size: 0.8rem; }
+
+    input[type="file"] { display: none; }
+  </style>
+</head>
+<body>
+
+<h1>MindAR Target Compiler</h1>
+<p class="sub">Nahraj obrázek → vygeneruje se targets.mind soubor</p>
+
+<div class="drop-zone" id="drop-zone">
+  <p class="drop-text">Klikni nebo přetáhni obrázek sem</p>
+</div>
+<input type="file" id="file-input" accept="image/*">
+
+<button id="compile-btn">Kompilovat target</button>
+
+<div id="progress"><span class="spinner"></span> <span id="progress-text">Kompiluji...</span></div>
+<div class="log" id="log"></div>
+<div class="result" id="result">
+  <a id="download-link" href="#" download="targets.mind">Stáhnout targets.mind</a>
+  <p>Vlož soubor do složky s index.html</p>
+</div>
+
+<!-- MindAR compiler -->
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"></script>
+
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+  const compileBtn = document.getElementById('compile-btn');
+  const progress = document.getElementById('progress');
+  const progressText = document.getElementById('progress-text');
+  const logEl = document.getElementById('log');
+  const resultEl = document.getElementById('result');
+  const downloadLink = document.getElementById('download-link');
+
+  let selectedImage = null;
+
+  function log(msg, type = '') {
+    const p = document.createElement('p');
+    p.textContent = msg;
+    if (type) p.className = type;
+    logEl.appendChild(p);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // Drop zone handling
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+  function handleFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      selectedImage = e.target.result;
+      dropZone.innerHTML = `<img src="${selectedImage}"><p class="drop-text">${file.name}</p>`;
+      compileBtn.style.display = 'inline-block';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // Compile
+  compileBtn.addEventListener('click', async () => {
+    if (!selectedImage) return;
+
+    compileBtn.disabled = true;
+    progress.style.display = 'block';
+    logEl.innerHTML = '';
+    resultEl.style.display = 'none';
+
+    try {
+      log('Načítám obrázek...');
+      
+      // Load image
+      const img = new Image();
+      img.src = selectedImage;
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+      log(`Obrázek načten: ${img.width}x${img.height}`, 'ok');
+
+      // Use MindAR compiler
+      log('Spouštím MindAR compiler...');
+      progressText.textContent = 'Extrakce feature pointů...';
+
+      const compiler = new MINDAR.IMAGE.Compiler();
+      
+      // Compile with progress callback
+      const data = await compiler.compileImageTargets([img], (progress_val) => {
+        const pct = Math.round(progress_val * 100);
+        progressText.textContent = `Kompiluji... ${pct}%`;
+        if (pct % 20 === 0) log(`Progress: ${pct}%`);
+      });
+
+      log('Kompilace dokončena!', 'ok');
+      progressText.textContent = 'Exportuji .mind soubor...';
+
+      // Export
+      const exportedBuffer = await compiler.exportData();
+      
+      // Create download
+      const blob = new Blob([exportedBuffer]);
+      const url = URL.createObjectURL(blob);
+      downloadLink.href = url;
+
+      log(`Soubor targets.mind vygenerován (${(blob.size / 1024).toFixed(1)} KB)`, 'ok');
+      
+      progress.style.display = 'none';
+      resultEl.style.display = 'block';
+
+    } catch (err) {
+      log(`Chyba: ${err.message}`, 'err');
+      progressText.textContent = 'Chyba při kompilaci';
+      console.error(err);
+    }
+
+    compileBtn.disabled = false;
+  });
+</script>
+
+</body>
+</html>
