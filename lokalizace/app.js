@@ -150,32 +150,18 @@
   }
 
   // ---------- AR ----------
-  async function compileTargets() {
-    const status = $('compileStatus');
-    try {
-      const pre = await fetch('targets-spike.mind');
-      if (pre.ok && (pre.headers.get('content-type') || '').indexOf('html') < 0) {
-        status.textContent = 'Markery: předkompilované.'; return await pre.arrayBuffer();
-      }
-    } catch (e) {}
-    const cached = await caches.open('spike').then(c => c.match('spikeMind-v2')).catch(() => null);
-    if (cached) { status.textContent = 'Markery: z cache.'; return await cached.arrayBuffer(); }
-    status.textContent = 'Kompiluji markery (poprvé, i pár minut)...';
-    const imgs = [];
-    for (const id of TARGETS) {
-      const f = findMarker(id);
-      const img = new Image(); img.src = f.m.image_ref.replace('lokalizace/', '');
-      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
-      imgs.push(img);
-    }
-    const compiler = new MINDAR.IMAGE.Compiler();
-    await compiler.compileImageTargets(imgs, p => { status.textContent = `Kompiluji... ${Math.round(p)} %`; });
-    const buf = await compiler.exportData();
-    try { const c = await caches.open('spike'); await c.put('spikeMind-v2', new Response(buf.slice(0))); } catch (e) {}
+  async function loadTargets() {
+    const r = await fetch('targets-spike.mind');
+    if (!r.ok) throw new Error('targets-spike.mind nenalezen (HTTP ' + r.status + '). Soubor musí být ve větvi — kompilace se v demu neprovádí.');
+    const ct = r.headers.get('content-type') || '';
+    if (ct.indexOf('html') >= 0) throw new Error('targets-spike.mind vrací HTML místo dat (špatná cesta/hosting).');
+    const buf = await r.arrayBuffer();
+    if (buf.byteLength < 10000) throw new Error('targets-spike.mind je podezřele malý (' + buf.byteLength + ' B).');
     return buf;
   }
 
   function startAR(mindBuffer) {
+    return new Promise((resolve, reject) => {
     const blobUrl = URL.createObjectURL(new Blob([mindBuffer]));
     const scene = document.createElement('a-scene');
     scene.setAttribute('mindar-image', `imageTargetSrc: ${blobUrl}; autoStart: true; uiLoading: no; uiScanning: no; uiError: no; maxTrack: 1;`);
@@ -197,7 +183,14 @@
         applyFix(poseFromAnchorMatrix(ent.object3D.matrix, f.m, f.d), f.m, f.d);
       }, 250);
     });
+    scene.addEventListener('renderstart', () => resolve());
+    scene.addEventListener('arError', (ev) => {
+      const detail = ev && ev.detail ? JSON.stringify(ev.detail) : 'AR chyba (kamera zamítnuta / nedostupná?)';
+      showError('AR engine', detail);
+      reject(new Error(detail));
+    });
     document.body.appendChild(scene);
+    });
   }
 
   // ---------- minimapa ----------
@@ -277,6 +270,16 @@
       `stanice: ${S.inStation || '—'}  DR: ${S.drSteps}`;
   }
   function setBadge(t, cls) { const b = $('fixBadge'); b.textContent = t; b.className = cls || ''; }
+  function showError(stage, msg) {
+    const e = $('errBanner');
+    e.textContent = 'Chyba (' + stage + '):\n' + msg;
+    e.classList.add('visible');
+    $('compileStatus').textContent = 'Chyba: ' + stage + ' — detail nahoře.';
+    $('btnAR').disabled = false;
+  }
+  function withTimeout(promise, ms, stage) {
+    return Promise.race([promise, new Promise((_, rej) => setTimeout(() => rej(new Error(stage + ' nedoběhl do ' + (ms / 1000) + ' s')), ms))]);
+  }
   let toastTimer;
   function showToast(text, ms) {
     const t = $('placeToast'); t.textContent = text; t.classList.add('visible');
@@ -346,16 +349,19 @@
   }
   $('btnAR').onclick = async () => {
     $('btnAR').disabled = true;
-    for (let i = 0; i < 100 && !(window.MINDAR && AFRAME.components['mindar-image']); i++) await new Promise(r => setTimeout(r, 200));
-    await askMotionPermission();
-    initSensors();
+    $('errBanner').classList.remove('visible');
     try {
-      const buf = await compileTargets();
+      if (!(window.MINDAR && window.AFRAME && AFRAME.components['mindar-image']))
+        throw new Error('Knihovny se nenačetly (AFRAME/MINDAR). Zkontroluj vendor/ soubory.');
+      $('compileStatus').textContent = 'Načítám markery...';
+      const buf = await withTimeout(loadTargets(), 15000, 'načtení targets');
+      await askMotionPermission();
+      initSensors();
       await boot('ar');
-      startAR(buf);
+      $('compileStatus').textContent = '';
+      await withTimeout(startAR(buf), 30000, 'start kamery/AR');
     } catch (e) {
-      $('compileStatus').textContent = 'Chyba: ' + e.message;
-      $('btnAR').disabled = false;
+      showError('start', e.message);
     }
   };
   $('btnSim').onclick = () => boot('sim');

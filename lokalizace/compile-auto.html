@@ -1,7 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><title>spike compile</title>
-<script type="module">import "https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image.prod.js"; window.__mindarReady = true;</script>
+<script>
+// MindAR compiler čeká na animation framy (tf.nextFrame) — v hidden tabu rAF netiká a kompilace visí.
+// Shim: rAF -> setTimeout, ať jde kompilovat i v neaktivním tabu / headless pane.
+// MessageChannel misto setTimeout: timery jsou v hidden tabu throttlovane na ~1/s, message eventy ne.
+const __rafQ = [];
+const __rafCh = new MessageChannel();
+__rafCh.port1.onmessage = () => { const cb = __rafQ.shift(); if (cb) cb(performance.now()); };
+window.requestAnimationFrame = (cb) => { __rafQ.push(cb); __rafCh.port2.postMessage(0); return 0; };
+window.cancelAnimationFrame = () => {};
+</script>
+<script type="module">import "./vendor/mindar/mindar-image.prod.js"; window.__mindarReady = true;</script>
 </head>
 <body>
 <pre id="s">start</pre>
