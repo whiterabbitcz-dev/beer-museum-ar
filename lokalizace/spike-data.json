@@ -1,0 +1,364 @@
+{
+  "meta": {
+    "source": "cbm-guide/content/stations/stations.json (v4, subset 2NP pro spike)",
+    "plan": {
+      "file": "plan-2np.webp",
+      "plan_width_px": 1600,
+      "drawing_width_px": 6222,
+      "scale_px_per_m": 150,
+      "scale_confidence": "low - kalibrovat"
+    },
+    "north_note": "Vykresovy sever = -y. Azimut markeru = smer normaly (wall) / smer sipky (floor), 0=sever, po smeru rucicek."
+  },
+  "stations": [
+    {
+      "id": "S2",
+      "order": 2,
+      "name": "Co je pivo",
+      "polygon": [
+        [
+          1250,
+          1030
+        ],
+        [
+          1950,
+          950
+        ],
+        [
+          1960,
+          1500
+        ],
+        [
+          1270,
+          1560
+        ]
+      ],
+      "centroid": [
+        1607.5,
+        1260.0
+      ]
+    },
+    {
+      "id": "S3",
+      "order": 3,
+      "name": "Historie piva",
+      "polygon": [
+        [
+          2200,
+          890
+        ],
+        [
+          3050,
+          730
+        ],
+        [
+          3070,
+          1050
+        ],
+        [
+          2880,
+          1830
+        ],
+        [
+          2300,
+          1930
+        ]
+      ],
+      "centroid": [
+        2700.0,
+        1286.0
+      ]
+    },
+    {
+      "id": "S4",
+      "order": 4,
+      "name": "Chmel a styly",
+      "polygon": [
+        [
+          640,
+          1190
+        ],
+        [
+          1250,
+          1030
+        ],
+        [
+          1300,
+          1800
+        ],
+        [
+          1240,
+          1990
+        ],
+        [
+          690,
+          1900
+        ]
+      ],
+      "centroid": [
+        1024.0,
+        1582.0
+      ]
+    },
+    {
+      "id": "S5",
+      "order": 5,
+      "name": "Beer tree",
+      "polygon": [
+        [
+          1960,
+          950
+        ],
+        [
+          2200,
+          890
+        ],
+        [
+          2300,
+          1930
+        ],
+        [
+          2100,
+          1970
+        ],
+        [
+          1990,
+          1500
+        ]
+      ],
+      "centroid": [
+        2110.0,
+        1448.0
+      ]
+    },
+    {
+      "id": "S6",
+      "order": 6,
+      "name": "Výroba piva",
+      "polygon": [
+        [
+          2330,
+          1950
+        ],
+        [
+          2890,
+          1850
+        ],
+        [
+          3100,
+          2150
+        ],
+        [
+          3640,
+          3010
+        ],
+        [
+          4610,
+          2950
+        ],
+        [
+          4720,
+          3320
+        ],
+        [
+          4680,
+          3930
+        ],
+        [
+          3630,
+          3985
+        ],
+        [
+          3230,
+          3200
+        ],
+        [
+          2800,
+          2350
+        ]
+      ],
+      "centroid": [
+        3563.0,
+        2869.5
+      ]
+    },
+    {
+      "id": "S7",
+      "order": 7,
+      "name": "Model pivovaru",
+      "polygon": [
+        [
+          2890,
+          1830
+        ],
+        [
+          3800,
+          1870
+        ],
+        [
+          3790,
+          2150
+        ],
+        [
+          2950,
+          2100
+        ]
+      ],
+      "centroid": [
+        3357.5,
+        1987.5
+      ]
+    },
+    {
+      "id": "S8",
+      "order": 8,
+      "name": "Lahve a stáčení",
+      "polygon": [
+        [
+          4040,
+          800
+        ],
+        [
+          4290,
+          740
+        ],
+        [
+          4310,
+          1985
+        ],
+        [
+          4060,
+          2000
+        ]
+      ],
+      "centroid": [
+        4175.0,
+        1381.25
+      ]
+    },
+    {
+      "id": "S9",
+      "order": 9,
+      "name": "Sudy a domácí vaření",
+      "polygon": [
+        [
+          4290,
+          600
+        ],
+        [
+          4890,
+          740
+        ],
+        [
+          4930,
+          1950
+        ],
+        [
+          4330,
+          1985
+        ]
+      ],
+      "centroid": [
+        4610.0,
+        1318.75
+      ]
+    },
+    {
+      "id": "S10",
+      "order": 10,
+      "name": "Výčepní zařízení",
+      "polygon": [
+        [
+          3500,
+          900
+        ],
+        [
+          4030,
+          800
+        ],
+        [
+          4040,
+          1450
+        ],
+        [
+          3510,
+          1500
+        ]
+      ],
+      "centroid": [
+        3770.0,
+        1162.5
+      ]
+    }
+  ],
+  "markers": [
+    {
+      "id": "VM-S5-01",
+      "station": "S5",
+      "floor": "2NP",
+      "x": 2150,
+      "y": 1500,
+      "azimuth_deg": 90,
+      "surface": "wall",
+      "physical_size_mm": {
+        "width": 200,
+        "height": 200
+      },
+      "image_ref": "lokalizace/markers/vm-s5.png",
+      "status": "spike_print",
+      "notes": "Cedulka stanice S5 (Beer tree) na příčce mezi západním a středním sálem, normála k východu."
+    },
+    {
+      "id": "VM-S7-01",
+      "station": "S7",
+      "floor": "2NP",
+      "x": 3300,
+      "y": 2150,
+      "azimuth_deg": 0,
+      "surface": "wall",
+      "physical_size_mm": {
+        "width": 200,
+        "height": 200
+      },
+      "image_ref": "lokalizace/markers/vm-s7.png",
+      "status": "spike_print",
+      "notes": "Cedulka stanice S7 (Model pivovaru) na jižní stěně zóny, normála k severu."
+    },
+    {
+      "id": "VM-FLOOR-01",
+      "station": "S5",
+      "floor": "2NP",
+      "x": 2550,
+      "y": 1450,
+      "azimuth_deg": 250,
+      "surface": "floor",
+      "physical_size_mm": {
+        "width": 250,
+        "height": 250
+      },
+      "image_ref": "lokalizace/markers/vm-floor.png",
+      "status": "spike_print",
+      "notes": "Žlutá podlahová šipka s unikátním patternem uprostřed středního sálu, ukazuje k Beer tree."
+    },
+    {
+      "id": "VM-PROKOP-01",
+      "station": "S3",
+      "floor": "2NP",
+      "x": 980,
+      "y": 3260,
+      "azimuth_deg": 45,
+      "surface": "wall",
+      "physical_size_mm": null,
+      "size_todo": true,
+      "image_ref": "lokalizace/markers/vm-prokop.png",
+      "status": "existing_art",
+      "notes": "Existující ilustrace mnicha 'Prokop na zdi' (foto 9110, monks world). Fyzický rozměr změřit při návštěvě; pro spike náhradní tisk 300 mm."
+    }
+  ],
+  "target_order": [
+    "VM-S5-01",
+    "VM-S7-01",
+    "VM-FLOOR-01",
+    "VM-PROKOP-01"
+  ]
+}

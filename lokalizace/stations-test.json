@@ -1,0 +1,618 @@
+{
+ "meta": {
+  "name": "Prokop testbed — Martinův byt",
+  "coord_system": "Polycam DXF, metry",
+  "source": "19. 7. 2026.dxf",
+  "note": "T3+T4 sdílí polygon kuchyně, T1+T6 polygon haly — rozlišení stanic je přes markery, ne zóny."
+ },
+ "rooms": {
+  "hala": [
+   [
+    -1.299,
+    0.182
+   ],
+   [
+    -1.299,
+    -0.56
+   ],
+   [
+    -1.299,
+    -2.163
+   ],
+   [
+    0.079,
+    -2.163
+   ],
+   [
+    4.614,
+    -2.163
+   ],
+   [
+    4.614,
+    -1.446
+   ],
+   [
+    4.614,
+    1.166
+   ],
+   [
+    4.101,
+    1.166
+   ],
+   [
+    3.07,
+    1.166
+   ],
+   [
+    3.07,
+    1.831
+   ],
+   [
+    1.777,
+    1.831
+   ],
+   [
+    1.777,
+    1.931
+   ],
+   [
+    -0.483,
+    1.931
+   ],
+   [
+    -0.483,
+    1.271
+   ],
+   [
+    -1.299,
+    1.271
+   ]
+  ],
+  "obyvak": [
+   [
+    1.777,
+    1.931
+   ],
+   [
+    1.777,
+    7.447
+   ],
+   [
+    -6.15,
+    7.447
+   ],
+   [
+    -6.15,
+    1.931
+   ],
+   [
+    -4.322,
+    1.931
+   ]
+  ],
+  "kuchyn": [
+   [
+    0.079,
+    -4.037
+   ],
+   [
+    0.079,
+    -5.098
+   ],
+   [
+    -1.239,
+    -5.098
+   ],
+   [
+    -1.239,
+    -8.33
+   ],
+   [
+    2.812,
+    -8.33
+   ],
+   [
+    2.812,
+    -2.81
+   ],
+   [
+    0.079,
+    -2.81
+   ]
+  ],
+  "loznice": [
+   [
+    4.149,
+    1.831
+   ],
+   [
+    3.924,
+    1.911
+   ],
+   [
+    4.149,
+    1.911
+   ],
+   [
+    6.149,
+    1.911
+   ],
+   [
+    6.149,
+    7.447
+   ],
+   [
+    5.318,
+    7.447
+   ],
+   [
+    2.141,
+    7.447
+   ],
+   [
+    2.141,
+    7.547
+   ],
+   [
+    1.777,
+    7.547
+   ],
+   [
+    1.777,
+    7.447
+   ],
+   [
+    1.777,
+    1.931
+   ],
+   [
+    1.777,
+    1.831
+   ],
+   [
+    3.07,
+    1.831
+   ]
+  ]
+ },
+ "stations": [
+  {
+   "id": "T1",
+   "order": 1,
+   "name": {
+    "cs": "Vstup / recepce",
+    "en": "Entrance / Reception"
+   },
+   "type": "service",
+   "room": "hala",
+   "polygon": [
+    [
+     -1.299,
+     0.182
+    ],
+    [
+     -1.299,
+     -0.56
+    ],
+    [
+     -1.299,
+     -2.163
+    ],
+    [
+     0.079,
+     -2.163
+    ],
+    [
+     4.614,
+     -2.163
+    ],
+    [
+     4.614,
+     -1.446
+    ],
+    [
+     4.614,
+     1.166
+    ],
+    [
+     4.101,
+     1.166
+    ],
+    [
+     3.07,
+     1.166
+    ],
+    [
+     3.07,
+     1.831
+    ],
+    [
+     1.777,
+     1.831
+    ],
+    [
+     1.777,
+     1.931
+    ],
+    [
+     -0.483,
+     1.931
+    ],
+    [
+     -0.483,
+     1.271
+    ],
+    [
+     -1.299,
+     1.271
+    ]
+   ],
+   "visual_markers": [
+    {
+     "id": "T1-M",
+     "x": -0.5,
+     "y": 1.85,
+     "normal": [
+      0,
+      -1
+     ],
+     "height_m": 1.45,
+     "size_mm": 170,
+     "image_ref": "T1.png",
+     "desc": "předsíň — severní stěna (mezi dveřmi do obýváku a ložnice)"
+    }
+   ],
+   "prokop_placeholder": "Vítej, poutníče! Já jsem bratr Prokop a tohle je vstupní síň. Projdeme spolu celou expozici — drž se žluté šipky."
+  },
+  {
+   "id": "T2",
+   "order": 2,
+   "name": {
+    "cs": "Expozice",
+    "en": "Exhibition"
+   },
+   "type": "exhibit",
+   "room": "obyvak",
+   "polygon": [
+    [
+     1.777,
+     1.931
+    ],
+    [
+     1.777,
+     7.447
+    ],
+    [
+     -6.15,
+     7.447
+    ],
+    [
+     -6.15,
+     1.931
+    ],
+    [
+     -4.322,
+     1.931
+    ]
+   ],
+   "visual_markers": [
+    {
+     "id": "T2-M",
+     "x": -3.5,
+     "y": 2.0,
+     "normal": [
+      0,
+      1
+     ],
+     "height_m": 1.45,
+     "size_mm": 170,
+     "image_ref": "T2.png",
+     "desc": "obývák — jižní vnitřní stěna (společná s halou/šatnou)"
+    }
+   ],
+   "prokop_placeholder": "Hlavní sál expozice! Zde by v muzeu visely cedule a stály vitríny. Rozhlédni se a pokračuj do varny."
+  },
+  {
+   "id": "T3",
+   "order": 3,
+   "name": {
+    "cs": "Varna",
+    "en": "Brewhouse"
+   },
+   "type": "exhibit",
+   "room": "kuchyn",
+   "polygon": [
+    [
+     0.079,
+     -4.037
+    ],
+    [
+     0.079,
+     -5.098
+    ],
+    [
+     -1.239,
+     -5.098
+    ],
+    [
+     -1.239,
+     -8.33
+    ],
+    [
+     2.812,
+     -8.33
+    ],
+    [
+     2.812,
+     -2.81
+    ],
+    [
+     0.079,
+     -2.81
+    ]
+   ],
+   "visual_markers": [
+    {
+     "id": "T3-M",
+     "x": 2.2,
+     "y": -2.85,
+     "normal": [
+      0,
+      -1
+     ],
+     "height_m": 1.45,
+     "size_mm": 170,
+     "image_ref": "T3.png",
+     "desc": "kuchyň — severní stěna (společná s halou), východně od dveří"
+    }
+   ],
+   "prokop_placeholder": "Varna! Konečně nějaká existuje. Tady se vaří — dnes sice ne pivo, ale princip je věčný: voda, teplo a trpělivost."
+  },
+  {
+   "id": "T4",
+   "order": 4,
+   "name": {
+    "cs": "Degustační sklep",
+    "en": "Tasting Cellar"
+   },
+   "type": "exhibit",
+   "room": "kuchyn",
+   "polygon": [
+    [
+     0.079,
+     -4.037
+    ],
+    [
+     0.079,
+     -5.098
+    ],
+    [
+     -1.239,
+     -5.098
+    ],
+    [
+     -1.239,
+     -8.33
+    ],
+    [
+     2.812,
+     -8.33
+    ],
+    [
+     2.812,
+     -2.81
+    ],
+    [
+     0.079,
+     -2.81
+    ]
+   ],
+   "visual_markers": [
+    {
+     "id": "T4-M",
+     "x": -1.15,
+     "y": -6.0,
+     "normal": [
+      1,
+      0
+     ],
+     "height_m": 1.45,
+     "size_mm": 170,
+     "image_ref": "T4.png",
+     "desc": "kuchyň — západní stěna, jižní část (u lednice? uprav dle reality)"
+    }
+   ],
+   "prokop_placeholder": "Degustační sklep. Otevři chladicí truhlici — ehm, lednici — a vyber si vzorek. Střídmě, jak káže řehole."
+  },
+  {
+   "id": "T5",
+   "order": 5,
+   "name": {
+    "cs": "Ledárna",
+    "en": "Ice House"
+   },
+   "type": "exhibit",
+   "room": "loznice",
+   "polygon": [
+    [
+     4.149,
+     1.831
+    ],
+    [
+     3.924,
+     1.911
+    ],
+    [
+     4.149,
+     1.911
+    ],
+    [
+     6.149,
+     1.911
+    ],
+    [
+     6.149,
+     7.447
+    ],
+    [
+     5.318,
+     7.447
+    ],
+    [
+     2.141,
+     7.447
+    ],
+    [
+     2.141,
+     7.547
+    ],
+    [
+     1.777,
+     7.547
+    ],
+    [
+     1.777,
+     7.447
+    ],
+    [
+     1.777,
+     1.931
+    ],
+    [
+     1.777,
+     1.831
+    ],
+    [
+     3.07,
+     1.831
+    ]
+   ],
+   "visual_markers": [
+    {
+     "id": "T5-M",
+     "x": 1.85,
+     "y": 5.5,
+     "normal": [
+      1,
+      0
+     ],
+     "height_m": 1.45,
+     "size_mm": 170,
+     "image_ref": "T5.png",
+     "desc": "ložnice — západní stěna (společná s obývákem)"
+    }
+   ],
+   "prokop_placeholder": "Ledárna! V zimě sem vozili led z Vltavy a vydržel pod senem celé léto. Dnes tu chladí leda klimatizace."
+  },
+  {
+   "id": "T6",
+   "order": 6,
+   "name": {
+    "cs": "Východ",
+    "en": "Exit"
+   },
+   "type": "service",
+   "room": "hala",
+   "polygon": [
+    [
+     -1.299,
+     0.182
+    ],
+    [
+     -1.299,
+     -0.56
+    ],
+    [
+     -1.299,
+     -2.163
+    ],
+    [
+     0.079,
+     -2.163
+    ],
+    [
+     4.614,
+     -2.163
+    ],
+    [
+     4.614,
+     -1.446
+    ],
+    [
+     4.614,
+     1.166
+    ],
+    [
+     4.101,
+     1.166
+    ],
+    [
+     3.07,
+     1.166
+    ],
+    [
+     3.07,
+     1.831
+    ],
+    [
+     1.777,
+     1.831
+    ],
+    [
+     1.777,
+     1.931
+    ],
+    [
+     -0.483,
+     1.931
+    ],
+    [
+     -0.483,
+     1.271
+    ],
+    [
+     -1.299,
+     1.271
+    ]
+   ],
+   "visual_markers": [
+    {
+     "id": "T6-M",
+     "x": 4.55,
+     "y": 0.3,
+     "normal": [
+      -1,
+      0
+     ],
+     "height_m": 1.45,
+     "size_mm": 170,
+     "image_ref": "T6.png",
+     "desc": "předsíň — východní stěna (u koupelny)"
+    }
+   ],
+   "prokop_placeholder": "A jsme na konci. Děkuji za návštěvu — a nezapomeň: dobré pivo se pije pomalu. Šťastnou cestu!"
+  }
+ ],
+ "edges": [
+  {
+   "from": "T1",
+   "to": "T2"
+  },
+  {
+   "from": "T2",
+   "to": "T3"
+  },
+  {
+   "from": "T3",
+   "to": "T4"
+  },
+  {
+   "from": "T4",
+   "to": "T5"
+  },
+  {
+   "from": "T5",
+   "to": "T6"
+  }
+ ]
+}
