@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><title>spike compile</title>
+<script>
+// MindAR compiler čeká na animation framy (tf.nextFrame) — v hidden tabu rAF netiká a kompilace visí.
+// Shim: rAF -> setTimeout, ať jde kompilovat i v neaktivním tabu / headless pane.
+// MessageChannel misto setTimeout: timery jsou v hidden tabu throttlovane na ~1/s, message eventy ne.
+const __rafQ = [];
+const __rafCh = new MessageChannel();
+__rafCh.port1.onmessage = () => { const cb = __rafQ.shift(); if (cb) cb(performance.now()); };
+window.requestAnimationFrame = (cb) => { __rafQ.push(cb); __rafCh.port2.postMessage(0); return 0; };
+window.cancelAnimationFrame = () => {};
+</script>
+<script type="module">import "./vendor/mindar/mindar-image.prod.js"; window.__mindarReady = true;</script>
+</head>
+<body>
+<pre id="s">start</pre>
+<script>
+// Automatická kompilace markerů pro spike -> POST na lokální upload server (jen dev nástroj).
+(async () => {
+  for (let i = 0; i < 100 && !window.MINDAR; i++) await new Promise(r => setTimeout(r, 200));
+
+  const s = document.getElementById('s');
+  const log = (t) => { s.textContent += '\n' + t; };
+  try {
+    const order = ['markers/vm-s5.png', 'markers/vm-s7.png', 'markers/vm-floor.png', 'markers/vm-prokop.png', 'markers/T1.png', 'markers/T2.png', 'markers/T3.png', 'markers/T4.png', 'markers/T5.png', 'markers/T6.png'];
+    const imgs = [];
+    for (const src of order) {
+      const img = new Image(); img.src = src;
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; });
+      imgs.push(img); log('loaded ' + src);
+    }
+    const c = new MINDAR.IMAGE.Compiler();
+    await c.compileImageTargets(imgs, p => { s.textContent = 'compile ' + Math.round(p) + '%'; });
+    const buf = await c.exportData();
+    log('compiled ' + buf.byteLength + ' bytes');
+    const r = await fetch('http://localhost:8645/targets-spike.mind', { method: 'POST', body: buf });
+    log('upload: ' + await r.text());
+    document.title = 'DONE';
+  } catch (e) { log('ERROR ' + e.message); document.title = 'ERROR'; }
+})();
+</script>
+</body>
+</html>

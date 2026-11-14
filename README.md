@@ -110,3 +110,16 @@ document.getElementById('bg-sound').play();
 - [MindAR.js](https://hiukim.github.io/mind-ar-js-doc/) v1.2.5 – image tracking
 - [A-Frame](https://aframe.io/) – WebXR framework (součást MindAR bundlu)
 - Vanilla HTML/CSS/JS – žádné dependencies, žádný build step
+
+
+## Spike: vizuální lokalizace (lokalizace/)
+
+Technický spike pro Prokopova průvodce: tištěné markery (MindAR image tracking) jako lokalizační fixy nad `stations.json` z repa [cbm-guide](https://github.com/whiterabbitcz-dev/cbm-guide).
+
+- `lokalizace/index.html` — demo: AR režim (fix z markeru → pozice a heading na výkresu 2.NP), rotující minimapa, HUD šipka k další stanici, dead-reckoning mezi fixy (gyro + krokoměr), měřicí log, testovací místnost (byt/kancelář, metry), simulační režim bez kamery.
+- `lokalizace/tisk-vm-*.pdf` — markery k tisku na 100 % (kontrolní měřítko 100 mm na každé stránce).
+- `lokalizace/compile-auto.html` — dev nástroj: kompilace `targets-spike.mind` (POST na lokální upload server).
+- Data: `lokalizace/spike-data.json` = subset stations.json (2.NP) + visual_markers; zdroj pravdy je cbm-guide, tenhle soubor je generovaný.
+- Pozn.: mind-ar@1.2.5 na CDN je ES modul — načítat přes `<script type="module">`, jinak `MINDAR is not defined`.
+
+Report spiku s protokolem měření: `cbm-guide/docs/report-spike-ar.md`.
